@@ -1,0 +1,39 @@
+---
+title: "Replication Paper"
+author: "Angela Fu"
+date: "4/14/2020"
+output: pdf_document
+nocite: |
+  @*
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Abstract
+
+In their paper "Crossing the Line: Local Ethnic Geography and Voting in Ghana," Nahomi Ichino and Noah Nathan found that the local ethnic demographics of the area in which Ghanian voters live affected who they chose to support in the 2008 Ghana presidential election. I have reexamined their models and added an additional variable to explore the effect of a voter's trust in members of their own ethnicity. (Will add more after extension is complete)
+
+## Introduction
+
+Researchers have long sought to explore how a voter's ethnicity affects their voting preferences. This issue becomes more salient in countries where patronage politics is an issue. It is commonly thought that voters will support candidates who share their same ethnicity because they expect that candidate to then favor other co-ethnics. Ichino and Nathan, however, show that the demographics of the area in which a voter lives also matter. Using voting data from the 2008 Ghana presidential election and survey data from the Afrobarometer, they found that a voter who lives in an area dominated by one ethnicity are more likely to support a candidate whose ethnicity matches that of the area in which they live, not their own ethnicity.
+
+In replicating Ichino and Nathan's paper, I used R`citation()`. The data and code come from Harvard Dataverse. The code in this paper can be found on GitHub^[https://github.com/angelafu7/CrossingTheLineReplication].
+
+I have chosen to reexamine the regressions Ichino and Nathan built to predict the likelihood that an individual support the New Patrotic Party or the National Democratic Congress. I have added a varaible that measures whether an individual trusts co-ethnics as that will likely influence their voting decisions. I have also added an interaction term between the level of poverty an individual has experienced and their outlook on the economy as the two are likely related. An individual who is living in poverty is likely to have a more negative outlook on the economy. 
+
+## Literature Review
+
+The effect ethnicity has on elections in sub-Saharan Africa has long been studied by researchers. This is because many politicians engage in patronage, and voters have come to expect that the provision of public goods will be determined in part by ethnicity. Essentially, voters expect that politicians will provide more goods to people who share their same ethnicity. 
+
+The view that ethnicity and voting are linked has come to be widely accepted. Research has shown, for example, that countries that are ethnically heterogenous have resulted in the under-provision of non-excludable public goods but a high prevalence of patronage gods [@R-Kimenyi].
+
+Though this view has been widely adopted, increasing research has shown that the link may not be so simple. For example, research using results from the Afrobarometer, a series of surveys distributed across the continent, show that voters take other factors into consideration. For example, one study found that voters in addition to considering ethnic ties, will also base their votes on economic outcomes [@R-Bratton].
+
+The case of Ghana in particular is interesting because the results of its 2008 presidential election do not confrom with the theory that ethnicity and voter preferences are so simply linked. The two parties, the National Democratic Congress and the New Patriotic Party, saw support from voters across ethnic lines. One theory for this phenomenon is that the perceptions of the individual parties and candidates had more of an effect on how voters cast their ballot [@R-Hoffman]. 
+
+However, Ichino and Nathan have found instead that while ethnicity does play a role, it does not do so in the way most researchers would expect. Though some voters certainly do vote along ethnic lines, others voter across those lines when they live in an area that is heavily populated by members of another ethnic group. The reason behind this is that they expect the candidate they choose to better provide public goods to areas in which they saw the most support. Thus, it is in voters' best interest to voter across ethnic lines if they are surrounded by members of a different ethnicity.   
+
+## Bibliography
