@@ -1,7 +1,7 @@
 ---
 title: "Replication Paper"
 author: "Angela Fu"
-date: "4/14/2020"
+date: "5/8/2020"
 output: pdf_document
 nocite: |
   @*
@@ -10,11 +10,14 @@ bibliography: bibliography.bib
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(miceadds)
+library(tidyverse)
+library(stargazer)
 ```
 
 ## Abstract
 
-In their paper "Crossing the Line: Local Ethnic Geography and Voting in Ghana," Nahomi Ichino and Noah Nathan found that the local ethnic demographics of the area in which Ghanian voters live affected who they chose to support in the 2008 Ghana presidential election. I have reexamined their models and added an additional variable to explore the effect of a voter's trust in members of their own ethnicity. (Will add more after extension is complete)
+In their paper "Crossing the Line: Local Ethnic Geography and Voting in Ghana," Nahomi Ichino and Noah Nathan found that the local ethnic demographics of the area in which Ghanian voters live affected who they chose to support in the 2008 Ghana presidential election. I successfully replicated Ichino's and Nathan's results. I have also reexamined their models and added an additional variable to explore the effect of a voter's trust in members of their own ethnicity. I found that the inclusion of this variable does not significantly alter the model. As a result, trust in one's co-ethnics or in others of a different ethnicity do not impact one's voting decisions as much as the demographics of one's location do.  
 
 ## Introduction
 
@@ -35,5 +38,122 @@ Though this view has been widely adopted, increasing research has shown that the
 The case of Ghana in particular is interesting because the results of its 2008 presidential election do not confrom with the theory that ethnicity and voter preferences are so simply linked. The two parties, the National Democratic Congress and the New Patriotic Party, saw support from voters across ethnic lines. One theory for this phenomenon is that the perceptions of the individual parties and candidates had more of an effect on how voters cast their ballot [@R-Hoffman]. 
 
 However, Ichino and Nathan have found instead that while ethnicity does play a role, it does not do so in the way most researchers would expect. Though some voters certainly do vote along ethnic lines, others voter across those lines when they live in an area that is heavily populated by members of another ethnic group. The reason behind this is that they expect the candidate they choose to better provide public goods to areas in which they saw the most support. Thus, it is in voters' best interest to voter across ethnic lines if they are surrounded by members of a different ethnicity.   
+
+## Replication
+
+I was able to replicate all of the major results of Ichino's and Nathan's paper.
+
+## Extension
+
+For the new model, I first made poverty and economy_oneyear an interaction term because doing so caused the standard error of the model to decrease. This makes sense given that poverty measures the level of poverty the respondent faces, and economy_oneyear measures the respondent's opinions as to whether or not the economy has improved in the past year. The two are likely related as one's personal financial situation will likely influence one's view of the economy.
+
+I then added trustown, which measures the degree to which the respondent trusts people from the same ethnic background, and trustother, which measures the degree to which the respondent trusts people from other ethnic backgrounds. The model remained largely the same, indicating that it is very robust.
+
+```{r data-setup}
+
+# read in data
+
+data <- read.csv("Data/IchinoNathan_APSR_pollingstation_data.csv", header=TRUE)
+data_survey <- read.csv("Data/IchinoNathan_APSR_survey_data.csv")
+
+```
+
+Original model
+
+```{r}
+data4 <- data_survey %>%
+  mutate(akan30_central = akan_30km_l_p*central) %>%
+  filter(urb == 0)
+
+model_original <- glm.cluster(vote_npp_pres ~ akan_30km_l_p + akan30_central + eth_akan + eth_ewe + eth_dagomba + male + economy_oneyear + poverty + dev_factor2 + central + r4, family = "binomial", data = data4, cluster = "fid0725")
+
+summary(model_original)
+```
+
+New Model
+
+```{r}
+model_new <- glm.cluster(vote_npp_pres ~ akan_30km_l_p + akan30_central + eth_akan + eth_ewe + eth_dagomba + male + dev_factor2 + central + r4 + poverty:economy_oneyear + trustown + trustother, family = "binomial", data = data4, cluster = "fid0725")
+
+summary(model_new)
+```
+
+## Appendix
+
+```{r table, include = FALSE, eval = FALSE}
+
+# Table 1 replication
+
+# choose pertinent data for the table
+
+data1 <- data %>%
+  select(area_sqkm, sex_total, akan_p_poly, gadangbe_p_poly, ewe_p_poly, guan_p_poly, gurma_p_poly, moledagbon_p_poly, grusi_p_poly, mande_p_poly, other_eth_p_poly, ethfrac_poly, english_percent, public_semipublic_p, dev_factor2, akan_30km_l_p, h_30rad_e)
+
+# create new table
+
+table1 <- matrix(NA, nrow=ncol(data1), ncol=4)
+
+# this calculates summary statistics for each variable
+
+for(i in 1:ncol(data1)){
+table1[i,1] <- mean(data1[,i])
+table1[i,2] <- sd(data1[,i])
+table1[i,3] <-min(data1[,i])
+table1[i,4] <-max(data1[,i])
+}
+
+# this labels the summary statistics
+
+colnames(table1)<-c("Mean", "SD", "Min", "Max")
+
+# this cuts off the numbers so there are no trailing digits
+
+table1 <- round(table1, digits=2)
+
+# this vector contains row lables
+
+Variable <- c("Area (sq. km.)", "Total population", "% Akan at polling station", "% Ga-Dangbe at polling station", "% Ewe at polling station", "% Guan at polling station", "% Gurma at polling station", "% Mole-Dagbon at polling station", "% Grusi at polling station", "Mande at polling station", "% Other ethnic groups at polling station", "Ethnic fractionalization", "% Speak English", "% Public/semipublic employment", "Development index (EA)", "Akan in 30 km (spatially weighted)", "Segregation (H) in 30 km")
+
+# add the row labels to the final table
+
+table1 <- cbind(Variable, table1)
+
+# use gt to make the table well-formatted and to add more details
+
+gttable <- gt(table1) %>%
+  tab_header(
+    title = "Table 1",
+    subtitle = "Summary Statistics for Enumeration Areas around Brong Ahafo Polling Stations" 
+    ) %>%
+  tab_source_note(
+        source_note = md("*Note: n* = 1633. Data sources described in the text")
+      )
+
+# print table
+
+gttable
+```
+
+```{r, results = "asis", include = FALSE, results = FALSE}
+m1 <- lm(npp2008ps_pres_p ~ akan_p_poly + moledagbon_p_poly + otherethn_p_poly + public_semipublic_p + dev_factor2 + factor(c230_id_h), data=data, weights=totalvotes2008ps_pres)
+
+m2 <- lm(npp2008ps_pres_p ~ akan_p_poly + moledagbon_p_poly + otherethn_p_poly + public_semipublic_p + dev_factor2 + akan_30km_l_p + factor(c230_id_h), data=data, weights= totalvotes2008ps_pres)
+
+m3 <- lm(npp2008ps_pres_p ~ akan_p_poly  + moledagbon_p_poly + otherethn_p_poly + public_semipublic_p + dev_factor2 + akan_30km_l_p + I(akan_30km_l_p*akan_p_poly) + factor(c230_id_h), data=data, weights= totalvotes2008ps_pres)
+
+# print result
+stargazer(m1, m2, m3, 
+          type = "latex", 
+          style = "apsr",
+          order = c(6,7,1,2,3,4,5),
+          keep = c("\\bakan_30km_l_p\\b", "\\bakan_p_poly\\b", "\\bmoledagbon_p_poly\\b", "\\botherethn_p_poly\\b", "\\bpublic_semipublic_p\\b", "\\bdev_factor2\\b"),
+          omit.stat = c("n", "adj.rsq", "ser", "f"),
+          covariate.labels = c("\\% Akan in 30 km (spatially weighted)", "\\% Akan in 30 km (spatially weighted)", "\\% Akan at polling station", "\\% Mole-Dagbon at polling station", "\\% Minor ethnic groups at polling station", "\\% Public sector employment", "Development index (EA)"),
+          title = "TABLE 2. Local Ethnic Geography and NPP Vote Share in the 2008 Presidential Election",
+          dep.var.labels.include = FALSE,
+          notes = "\\parbox[t]{12cm}{Notes: Significant at p < 0.10; *p < 0.05; **p < 0.01; ***p < 0.001. n = 1580. Weighted least squares with weights equal to total votes cast in the first round of the 2008 presidential election by polling station. All models include parliamentary constituency fixed effects (not shown). Standard errors in parentheses}",
+          notes.append = FALSE,
+          header = FALSE)
+```
 
 ## Bibliography
