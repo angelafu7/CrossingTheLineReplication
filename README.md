@@ -1,1 +1,1 @@
-# CrossingTheLineReplication
+This replication exercise of Nahomi Ichino's and Noah Nathan's paper "Crossing the Line: Local Ethnic Geography and Voting in Ghana" was done as part of an assignment for the class Gov 1006: "Models" at Harvard. 
